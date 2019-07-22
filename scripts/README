@@ -1,0 +1,31 @@
+
+I'd rather not overwrite the original scripts so I've put mine in scripts/
+
+from the base dir
+
+make
+make install
+
+
+
+
+hawkDir=/home/jake/.github/jakewendt/HAWK
+
+nohup ${hawkDir}/scripts/hawk_countKmers.bash --proper_pair_only --bam_quality 60 --source_path /raid/data/raw/CCLS/bam --unique_extension .recaled.bam >> countKmers.out 2>&1 &
+
+
+Next step requires a gwas_info.txt in the format of ...
+
+SAMPLE1	M	Case
+SAMPLE2	F	Case
+SAMPLE3	M	Control
+SAMPLE4	F	Control
+
+It doesn't have to be sorted.
+
+nohup ${hawkDir}/scripts/hawk_runHawk.bash >> runHawk.out 2>&1 &
+
+
+
+nohup ${hawkDir}/scripts/hawk_runAbyss.bash >> runAbyss.out 2>&1 &
+
