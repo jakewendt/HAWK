@@ -4,14 +4,25 @@ I'd rather not overwrite the original scripts so I've put mine in scripts/
 from the base dir
 
 make
+
+cd supplements
+tar xvfz jellyfish-Hawk.tar.gz 
+cd ../supplements
+tar xfvz EIG6.0.1-Hawk.tar.gz
+
+cd ..
 make install
 
 
 
+This should put everything needed in ~/.local/bin/
 
-hawkDir=/home/jake/.github/jakewendt/HAWK
 
-nohup ${hawkDir}/scripts/hawk_countKmers.bash --proper_pair_only --bam_quality 60 --source_path /raid/data/raw/CCLS/bam --unique_extension .recaled.bam >> countKmers.out 2>&1 &
+
+
+nohup hawk_countKmers.bash --proper_pair_only --bam_quality 60 --source_path /raid/data/raw/CCLS/bam --unique_extension .recaled.bam >> countKmers.out 2>&1 &
+
+
 
 
 Next step requires a gwas_info.txt in the format of ...
@@ -21,11 +32,22 @@ SAMPLE2	F	Case
 SAMPLE3	M	Control
 SAMPLE4	F	Control
 
-It doesn't have to be sorted.
+It doesn't have to be sorted, I don't think.
 
-nohup ${hawkDir}/scripts/hawk_runHawk.bash >> runHawk.out 2>&1 &
+SAMPLE*.kmers.hist.csv
+SAMPLE*_total_kmer_counts.txt
+SAMPLE*_kmers_sorted.txt.gz
+
+( Still working on the gzipped files. )
+
+nohup hawk_runHawk.bash >> runHawk.out 2>&1 &
 
 
 
-nohup ${hawkDir}/scripts/hawk_runAbyss.bash >> runAbyss.out 2>&1 &
+
+ABySS https://github.com/bcgsc/abyss is required for ...
+
+nohup hawk_runAbyss.bash >> runAbyss.out 2>&1 &
+
+
 

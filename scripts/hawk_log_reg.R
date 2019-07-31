@@ -5,9 +5,9 @@ library(doParallel)
 library(optparse)
 
 option_list = list(
-	make_option(c('-c', '--case_or_control'), type='character', default=NULL, 
+	make_option(c('-c', '--case_or_control'), type='character', default=NULL,
 		help='case or control', metavar='character')
-); 
+);
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 message( 'Case or Control: ',opt$case_or_control )
@@ -47,7 +47,7 @@ for(i in 1:length(Y)) {
 
 print(Y);
 
-if (FALSE) { 
+if (FALSE) {
 	input <- read.table('covariates.txt');
 	for(i in 1:length(cov)) {
 		if(input[i,1]=='M') {
@@ -129,7 +129,7 @@ while(TRUE){
 } #	while or for loop
 
 
-close(con); 
+close(con);
 
 print(proc.time() - ptm)
 

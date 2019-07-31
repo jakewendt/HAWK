@@ -9,15 +9,7 @@ set -u	#	Error on usage of unset variables
 set -o pipefail
 
 
-#hawkDir=/home/jake/HAWK-0.9.8-beta
-hawkDir=/home/jake/.github/jakewendt/HAWK
-
-#	included version doesn't run. "missing libgsl.so.0". Won't compile. "baseprog recipe failed"
-eigenstratDir=${hawkDir}/supplements/EIG6.0.1-Hawk/bin
-#	Using "apt install eigensoft"
-#eigenstratDir=/usr/bin
 isDiploid=1
-
 
 
 #	my mods moved from countKmers script
@@ -56,7 +48,8 @@ if [ -f $f ] && [ ! -w $f ] ; then
 else
 	echo "Creating $f"
 	#	split gwas_info / total_kmer_counts.txt / sorted_files.txt into case/control files
-	$hawkDir/preProcess
+	#$hawkDir/preProcess
+	hawk_preProcess
 	chmod a-w $f
 
 	#-rw-rw-r-- 1 jake            0 Jun 21 07:38 control_total_kmers.txt
@@ -102,7 +95,8 @@ else
 	echo "Creating $f"
 	#	This can take about a day
 	#	It produces 7 files
-	$hawkDir/hawkgz $caseCount $controlCount
+	#$hawkDir/hawkgz $caseCount $controlCount
+	hawk_hawkgz $caseCount $controlCount
 	chmod a-w $f
 
 	#-rw-rw-r-- 1 jake            0 Jun 21 07:39 control_out_wo_bonf.kmerDiff
@@ -139,6 +133,16 @@ date
 #-rw-r--r-- 1 root 2352808 Dec  7  2015 libgsl.so.19.0.0
 #[jake@system76-server /usr/lib/x86_64-linux-gnu]$ sudo ln -s libgsl.so.19.0.0 libgsl.so.0
 
+cat > parfile.txt << EOF
+genotypename: gwas_eigenstratX.geno
+snpname:      gwas_eigenstratX.snp
+indivname:    gwas_eigenstratX.ind
+evecoutname:  gwas_eigenstrat.evec
+evaloutname:  gwas_eigenstrat.eval
+usenorm:        YES
+numoutlieriter: 0
+numoutevec:     10
+EOF
 
 
 f=log_eigen.txt
@@ -147,9 +151,11 @@ if [ -f $f ] && [ ! -w $f ] ; then
 else
 	echo "Creating $f"
 	if [ "$isDiploid" == "0" ]; then
-		$eigenstratDir/smartpca -V -p $hawkDir/parfile.txt > ${f}
+		#$eigenstratDir/smartpca -V -p $hawkDir/parfile.txt > ${f}
+		hawk_smartpca -V -p parfile.txt > ${f}
 	else
-		$eigenstratDir/smartpca -p $hawkDir/parfile.txt > ${f}
+		#$eigenstratDir/smartpca -p $hawkDir/parfile.txt > ${f}
+		hawk_smartpca -p parfile.txt > ${f}
 	fi
 	chmod a-w $f
 	chmod a-w gwas_eigenstrat.evec "gwas_eigenstrat.eval"
@@ -167,7 +173,8 @@ if [ -f $f ] && [ ! -w $f ] ; then
 	echo "Write-protected $f exists. Skipping."
 else
 	echo "Creating $f"
-	$eigenstratDir/evec2pca.perl 10 gwas_eigenstrat.evec gwas_eigenstratX.ind gwas_eigenstrat.pca
+	#$eigenstratDir/evec2pca.perl 10 gwas_eigenstrat.evec gwas_eigenstratX.ind gwas_eigenstrat.pca
+	hawk_evec2pca.perl 10 gwas_eigenstrat.evec gwas_eigenstratX.ind gwas_eigenstrat.pca
 	chmod a-w $f
 fi
 date
@@ -236,7 +243,8 @@ if [ -f $f ] && [ ! -w $f ] ; then
 	echo "Write-protected $f exists. Skipping."
 else
 	echo "Creating $f"
-	${hawkDir}/scripts/hawk_log_reg.R -c 'case'
+	#${hawkDir}/scripts/hawk_log_reg.R -c 'case'
+	hawk_log_reg.R -c 'case'
 	chmod a-w $f
 fi
 date
@@ -246,7 +254,8 @@ if [ -f $f ] && [ ! -w $f ] ; then
 	echo "Write-protected $f exists. Skipping."
 else
 	echo "Creating $f"
-	${hawkDir}/scripts/hawk_log_reg.R -c 'control'
+	#${hawkDir}/scripts/hawk_log_reg.R -c 'control'
+	hawk_log_reg.R -c 'control'
 	chmod a-w $f
 fi
 date
@@ -297,7 +306,8 @@ if [ -f $f ] && [ ! -w $f ] ; then
 	echo "Write-protected $f exists. Skipping."
 else
 	echo "Creating $f"
-	$hawkDir/convertToFasta    
+	#$hawkDir/convertToFasta
+	hawk_convertToFasta
 	chmod a-w case_kmers.fasta control_kmers.fasta
 fi
 date
@@ -306,5 +316,5 @@ date
 #rm case_out_w_bonf.kmerDiff
 #rm case_out_wo_bonf.kmerDiff
 #rm control_out_w_bonf.kmerDiff
-#rm control_out_wo_bonf.kmerDiff        
+#rm control_out_wo_bonf.kmerDiff
 

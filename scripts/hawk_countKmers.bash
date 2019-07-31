@@ -7,6 +7,7 @@ set -o pipefail
 
 
 script=$( basename $0 )
+script_dir=$( dirname $0 )
 source_path='/raid/data/raw/CCLS/bam'
 unique_extension='.recaled.bam'
 threads=40
@@ -67,16 +68,6 @@ echo "Canonical : ${canonical}"
 KMERSIZE=31 # RD:61
 
 
-#hawkDir=/home/jake/HAWK-0.9.8-beta
-hawkDir=/home/jake/.github/jakewendt/HAWK
-#	My version, 2.2.4 never completed?
-jellyfishDir=${hawkDir}/supplements/jellyfish-Hawk/bin	# the included version is modified 1.1.6
-#jellyfishDir=/usr/bin
-#sortDir=/usr/bin # my normal version seems to be the parallel version
-
-
-#for file in $( ls -d /raid/data/raw/CCLS/bam/*bam )
-#for file in $( ls /raid/data/raw/CCLS/bam/{GM_,}{983899,63185,268325,439338,634370}.recaled.bam )
 
 for file in $( ls ${source_path}/*${unique_extension} )
 do
@@ -132,7 +123,8 @@ do
 			#		particularly when select high quality mappings
 
 			date
-			${jellyfishDir}/jellyfish count ${canonical} --output ${OUTPREFIX}_kmers/tmp \
+			#${jellyfishDir}/jellyfish count ${canonical} --output ${OUTPREFIX}_kmers/tmp \
+			hawk_jellyfish count ${canonical} --output ${OUTPREFIX}_kmers/tmp \
 				--mer-len ${KMERSIZE} --threads ${threads} --size 5G \
 				<( eval ${command} )
 			date
@@ -144,7 +136,8 @@ do
 			then
 	 			mv ${OUTPREFIX}_kmers/tmp_0 ${f}
 			else
-				${jellyfishDir}/jellyfish merge -o ${f} ${OUTPREFIX}_kmers/tmp*
+				#${jellyfishDir}/jellyfish merge -o ${f} ${OUTPREFIX}_kmers/tmp*
+				hawk_jellyfish merge -o ${f} ${OUTPREFIX}_kmers/tmp*
 			fi
 			rm -rf ${OUTPREFIX}_kmers
 
@@ -162,7 +155,8 @@ do
 				echo "Write-protected $f2 exists. Skipping."
 			else
 				echo "Creating $f2"
-				${jellyfishDir}/jellyfish histo --full --output ${f2} --threads ${threads} ${OUTPREFIX}_kmers_jellyfish
+				#${jellyfishDir}/jellyfish histo --full --output ${f2} --threads ${threads} ${OUTPREFIX}_kmers_jellyfish
+				hawk_jellyfish histo --full --output ${f2} --threads ${threads} ${OUTPREFIX}_kmers_jellyfish
 				chmod a-w $f2
 			fi
 
@@ -179,52 +173,52 @@ do
 			echo "Write-protected $f exists. Skipping."
 		else
 			echo "Creating $f"
-			awk -f ${hawkDir}/countTotalKmer.awk ${OUTPREFIX}.kmers.hist.csv > ${f}
+			#awk -f ${hawkDir}/countTotalKmer.awk ${OUTPREFIX}.kmers.hist.csv > ${f}
+			awk -f ${script_dir}/hawk_countTotalKmer.awk ${OUTPREFIX}.kmers.hist.csv > ${f}
 			chmod a-w $f
 		fi
 
-		f3=${OUTPREFIX}_kmers_sorted.txt.gz
-		if [ -f $f3 ] && [ ! -w $f3 ] ; then
-			echo "Write-protected $f3 exists. Skipping."
+		f1=${OUTPREFIX}_kmers_sorted.txt.gz
+		if [ -f $f1 ] && [ ! -w $f1 ] ; then
+			echo "Write-protected $f1 exists. Skipping."
 		else
 
-			f=${OUTPREFIX}_kmers_sorted.txt
-			if [ -f $f ] && [ ! -w $f ] ; then
-				echo "Write-protected $f exists. Skipping."
+			f2=${OUTPREFIX}_kmers_sorted.txt
+			if [ -f $f2 ] && [ ! -w $f2 ] ; then
+				echo "Write-protected $f2 exists. Skipping."
 			else
 				#	Original version does this with CUTOFF. I have no idea why.
 				#	Set it to 1, output it to a file, then add 1 and use as the lower limit.
 				#	Everytime? Why not just fixed as 2?
 				#	CUTOFF=1
 				#	echo $CUTOFF > ${OUTPREFIX}_cutoff.csv
-				#	${jellyfishDir}/jellyfish dump -c -L `expr $CUTOFF + 1` ${OUTPREFIX}_kmers_jellyfish > ${OUTPREFIX}_kmers.txt
-	
-				f2=${OUTPREFIX}_kmers.txt
-				if [ -f $f2 ] && [ ! -w $f2 ] ; then
-					echo "Write-protected $f2 exists. Skipping."
+				#	${jellyfishDir}/jellyfish dump -c -L `expr $CUTOFF + 1` \
+				#		${OUTPREFIX}_kmers_jellyfish > ${OUTPREFIX}_kmers.txt
+
+				f3=${OUTPREFIX}_kmers.txt
+				if [ -f $f3 ] && [ ! -w $f3 ] ; then
+					echo "Write-protected $f3 exists. Skipping."
 				else
-					echo "Creating $f2"
-					${jellyfishDir}/jellyfish dump --column --lower-count 2 ${OUTPREFIX}_kmers_jellyfish > ${f2}
-					chmod a-w $f2
+					echo "Creating $f3"
+					#${jellyfishDir}/jellyfish dump --column --lower-count 2 ${OUTPREFIX}_kmers_jellyfish > ${f3}
+					hawk_jellyfish dump --column --lower-count 2 ${OUTPREFIX}_kmers_jellyfish > ${f3}
+					chmod a-w $f3
 				fi
-	
-				echo "Creating $f"
-				sort --parallel=${threads} -n -k 1 ${OUTPREFIX}_kmers.txt > ${f}
-				chmod a-w $f
-	
-				rm -f $f2
+
+				echo "Creating $f2"
+				sort --parallel=${threads} -n -k 1 ${f3} > ${f2}
+				chmod a-w $f2
+
+				rm -f $f3
 			fi
 
-			gzip --best $f
+			gzip --best $f2
 			#	should be "a-w" already as gzip preserves
 			#	it also removes the source so no rm necessary
 		fi
 
+		rm -f ${OUTPREFIX}_kmers_jellyfish
+
 	fi
-
-	rm -f ${OUTPREFIX}_kmers_jellyfish
-#	rm -f ${OUTPREFIX}_kmers.txt
-
-#	echo "${OUTPREFIX}_kmers_sorted.txt" >> sorted_files.txt
 
 done

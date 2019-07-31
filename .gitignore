@@ -1,1 +1,13 @@
 .DS_Store
+supplements/EIG6.0.1-Hawk/
+supplements/jellyfish-Hawk/
+bonf_fasta
+convertToFasta
+hawk
+hawk_convertToFasta
+hawk_preProcess
+hawkgz
+kmersearch
+kmersummary
+preProcess
+
