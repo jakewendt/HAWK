@@ -96,7 +96,7 @@ else
 	#	This can take about a day
 	#	It produces 7 files
 	#$hawkDir/hawkgz $caseCount $controlCount
-	hawk_hawkgz $caseCount $controlCount
+	hawkgz $caseCount $controlCount
 	chmod a-w $f
 
 	#-rw-rw-r-- 1 jake            0 Jun 21 07:39 control_out_wo_bonf.kmerDiff
