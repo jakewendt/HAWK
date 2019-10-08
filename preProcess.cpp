@@ -53,13 +53,17 @@ int main(int argc, const char * argv[])
 
 	while(fgets(line, MAX_FILE_READ, infoFile)!=NULL) {
 
-		printf("%s\n",line);
+		//printf("%s\n",line);
 
 		strcpy(line2,line);
+
+		//	Expecting "sampleid<TAB>sex<TAB>Case or Control"
 
 		temp=strtok(line,"\t\n ");
 		temp=strtok(NULL,"\t\n ");
 		temp=strtok(NULL,"\t\n ");
+		
+		//printf("%s\n",temp);
 
 		if(strncmp(toLower(temp),"case",4)==0 || strncmp(toLower(temp),"1",1)==0) {
 
