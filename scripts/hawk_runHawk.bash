@@ -42,6 +42,10 @@ fi
 noInd=$(cat sorted_files.txt | wc -l)
 
 
+
+#	gwas_info.txt MUST be TAB separated
+
+
 f="case.ind"
 if [ -f $f ] && [ ! -w $f ] ; then
 	echo "Write-protected $f exists. Skipping."
