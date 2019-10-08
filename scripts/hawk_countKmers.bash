@@ -14,12 +14,13 @@ threads=40
 canonical=''
 bam_quality=40
 proper_pair_only=''
+kmersize=31
 
 function usage(){
 	echo
 	echo "Usage: (NO EQUALS SIGNS)"
 	echo
-	echo "$script [--source_path STRING] [--unique_extension STRING] [--extension STRING] [--threads INTEGER] [--bam_quality INTEGER] [--canonical] [--proper_pair_only]"
+	echo "$script [--source_path STRING] [--unique_extension STRING] [--extension STRING] [--threads INTEGER] [--bam_quality INTEGER] [--kmersize ODD_INTEGER] [--canonical] [--proper_pair_only]"
 	echo
 	echo "Example:"
 	echo "$script -s /raid/data/raw/MS-20190422 -u _R1.fastq.gz -e fastq.gz --canonical"
@@ -45,6 +46,8 @@ while [ $# -ne 0 ] ; do
 			shift; proper_pair_only='-f 2';;
 		-b|--b*)
 			shift; bam_quality=$1; shift ;;
+		-k|--k*)
+			shift; kmersize=$1; shift ;;
 		-*)
 			echo ; echo "Unexpected args from: ${*}"; usage ;;
 		*)
@@ -63,11 +66,6 @@ echo "Canonical : ${canonical}"
 
 
 #base_dir=$PWD
-
-
-KMERSIZE=31 # RD:61
-
-
 
 for file in $( ls ${source_path}/*${unique_extension} )
 do
@@ -125,7 +123,7 @@ do
 			date
 			#${jellyfishDir}/jellyfish count ${canonical} --output ${OUTPREFIX}_kmers/tmp \
 			hawk_jellyfish count ${canonical} --output ${OUTPREFIX}_kmers/tmp \
-				--mer-len ${KMERSIZE} --threads ${threads} --size 5G \
+				--mer-len ${kmersize} --threads ${threads} --size 5G \
 				<( eval ${command} )
 			date
 
