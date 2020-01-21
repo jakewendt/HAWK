@@ -752,7 +752,7 @@ void printHelp() {
 	cout<<endl;
 	cout<<"hawk - hitting associations with k-mers"<<endl;
 	cout<<"Usage:"<<endl;
-	cout<<"hawk <noCases> <noControls>"<<endl;
+	cout<<"hawk <NUM_THREADS> <noCases> <noControls>"<<endl;
 	cout<<endl;
 	cout<<"It requires counting k-mers with Jellyfish before running."<<endl;
 	cout<<"Please see README for more details."<<endl;
@@ -761,6 +761,28 @@ void printHelp() {
 
 
 int main(int argc, const char * argv[]) {
+
+	if(argc<3)
+		printHelp();
+	if(strcmp(argv[1],"--help")==0 || strcmp(argv[1],"-h")==0)
+		printHelp();
+
+	NUM_THREADS=atoi(argv[1]);
+	noCases=atoi(argv[2]);
+	noControls=atoi(argv[3]);
+
+
+/*
+	JAKE - require passing number of threads to be used
+
+	Could look into something like
+		https://linux.die.net/man/3/getopt
+	to be more flexible.
+*/
+
+
+
+/*
 	if(argc<2)
 		printHelp();
 	if(strcmp(argv[1],"--help")==0 || strcmp(argv[1],"-h")==0)
@@ -768,6 +790,7 @@ int main(int argc, const char * argv[]) {
 
 	noCases=atoi(argv[1]);
 	noControls=atoi(argv[2]);
+*/
 
 	ht=new HashTable();
 
